@@ -26,9 +26,10 @@ export class Tab3Page {
   };
   constructor(
     private geolocation: Geolocation,
-    private nativeGeocoder: NativeGeocoder
+    private nativeGeocoder: NativeGeocoder,
   ) {
   }
+  //get current orientation
 
   
     //Get current coordinates of device
