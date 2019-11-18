@@ -1,13 +1,13 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>
-      Tab Two
+      Tab Two Edited4
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <img [src]="photo" >
+  <img [src]="currentImage" *ngIf="currentImage">
 
   <ion-fab vertical="bottom" horizontal="center" slot="fixed">
     <ion-fab-button (click)="takePicture()">
