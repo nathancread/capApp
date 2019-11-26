@@ -23,6 +23,7 @@ import { DeviceOrientation, DeviceOrientationCompassHeading } from '@ionic-nativ
     SplashScreen,
     Camera,
     Geolocation,
+    DeviceOrientation,
     NativeGeocoder,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
