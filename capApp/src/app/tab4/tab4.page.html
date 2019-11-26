@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Ionic 4 Geolocation & Geocoder
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+ 
+<ion-content padding>
+  <h1>Get Location</h1>
+ 
+  <ion-button (click)="getGeolocation()">
+    Get Location
+  </ion-button>
+  
+ 
+  <div *ngIf="geoLatitude">
+    <p>Latitude : {{geoLatitude}}</p>
+    <p>Longitude : {{geoLongitude}}</p>
+    <p>Accuracy : {{geoAccuracy}}</p>
+    <p class="address-text">
+ 
+      <span class="watch-text" *ngIf="isWatching; else notWatching">
+        Watching Location
+      </span>
+      <ng-template #notWatching>
+        Location Watch Stopped
+      </ng-template>
+ 
+      <br>Address : {{geoAddress }}
+    </p>
+  </div>
+ 
+</ion-content>

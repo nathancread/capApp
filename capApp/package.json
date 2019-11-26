@@ -25,7 +25,7 @@
     "@capacitor/ios": "^1.2.1",
     "@ionic-native/camera": "^5.16.0",
     "@ionic-native/core": "^5.0.0",
-    "@ionic-native/device-orientation": "^5.16.0",
+    "@ionic-native/device-orientation": "^5.17.0",
     "@ionic-native/geolocation": "^5.16.0",
     "@ionic-native/gyroscope": "^5.16.0",
     "@ionic-native/native-geocoder": "^5.16.0",
