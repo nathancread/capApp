@@ -1,20 +1,19 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>
-      Tab Four
+      Tab Four.2
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-<div *ngIf="compassReading">
+<div *ngIf="magneticReading">
   <p>Magnetic Compass Reading: {{magneticReading}} </p> 
-  <p>True Compass Reading: {{trueReading}} </p> 
 
 </div>
-  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-fab-button (click)="getCompass()">
+       <ion-fab vertical="bottom" horizontal="center" slot="fixed" >
+    <ion-fab-button (click)="check()">
       <ion-icon name="camera"></ion-icon>
     </ion-fab-button>
   </ion-fab>
