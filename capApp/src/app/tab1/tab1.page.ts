@@ -163,6 +163,7 @@ export class Tab1Page {
        this.btnText = 'End Compass';
     } else if(this.btnText == 'End Compass') {
        this.endCompass();
+       this.getGeolocation();
        this.compassButton = "checkmark-circle-outline";
        this.btnText = 'Read Compass';
     }
