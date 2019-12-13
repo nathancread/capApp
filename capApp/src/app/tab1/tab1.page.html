@@ -16,24 +16,30 @@
     <ion-list lines="none">
       <ion-list-header>
         <ion-label>Actions</ion-label>
+      <ion-item>
+        <div *ngIf="magneticReading">
+          <p> Compass Reading: {{magneticReading}} </p> 
+        </div>
+      </ion-item>
       </ion-list-header>
 
       <ion-item (click)="takePicture()">
-        <ion-icon slot="start" color="medium" name="radio-button-off"></ion-icon>
+        <ion-icon slot="start" color="medium" name={{pictureButton}}></ion-icon>
         <ion-label>Take picture</ion-label>
       </ion-item>
 
-      <ion-item href="https://ionicframework.com/docs/building/scaffolding">
-        <ion-icon slot="start" color="medium" name="build"></ion-icon>
-        <ion-label>Scaffold Out Your App</ion-label>
+      <ion-item (click)="check()">
+        <ion-icon slot="start" color="medium" name={{compassButton}}></ion-icon>
+        <ion-label>Read Compass</ion-label>
       </ion-item>
+
       <ion-item href="https://ionicframework.com/docs/layout/structure">
-        <ion-icon slot="start" color="medium" name="grid"></ion-icon>
-        <ion-label>Change Your App Layout</ion-label>
+        <ion-icon slot="start" color="medium" name="send"></ion-icon>
+        <ion-label>Send Data</ion-label>
       </ion-item>
-      <ion-item href="https://ionicframework.com/docs/theming/basics">
-        <ion-icon slot="start" color="medium" name="color-fill"></ion-icon>
-        <ion-label>Theme Your App</ion-label>
-      </ion-item>
+
+
+
+
     </ion-list>
 </ion-content>
