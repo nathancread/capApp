@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
+import { HttpClient, HttpHeaders} from '@angular/common/http';
 
 import { DeviceOrientation, DeviceOrientationCompassHeading } from '@ionic-native/device-orientation/ngx';
 import { Subscription } from 'rxjs';
 import { Events } from '@ionic/angular';
 import { Variable } from '@angular/compiler/src/render3/r3_ast';
+import { Tab3Page } from '../tab3/tab3.page';
 
 @Component({
   selector: 'app-tab4',
@@ -19,7 +21,8 @@ export class Tab4Page {
 
 
   constructor(
-    private deviceOrientation: DeviceOrientation
+    private deviceOrientation: DeviceOrientation,
+    private http: HttpClient,
   ) 
   {
     this.btnText = "Read Compass";
@@ -60,5 +63,34 @@ export class Tab4Page {
        this.btnText = 'Read Compass';
     }
  }
+
+ sendPostRequest() {
+  // headers = new Headers();
+  //const headers = new HttpParams();
+  //headers.append("Accept", 'application/json');
+  //headers.append('Content-Type', 'application/json' );
+  //const requestOptions = new HttpRequest();
+
+  const httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type':  'application/json',
+      'Authorization': 'my-auth-token'
+    })
+  };
+
+  let postData = {
+          "Image": "img.jpg",
+          "Latitude": "11.12",
+          "Longitude": "12.34",
+          "Heading": this.compassReading.magneticHeading
+  }
+
+  this.http.post("http://dataserver-dev.us-west-2.elasticbeanstalk.com/data", postData, httpOptions)
+      .subscribe(data => {
+        console.log(data['_body']);
+       }, error => {
+        console.log(error);
+      });
+    }
 
 }

@@ -14,6 +14,9 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { NativeGeocoder } from '@ionic-native/native-geocoder/ngx';
 
 import { DeviceOrientation, DeviceOrientationCompassHeading } from '@ionic-native/device-orientation/ngx';
+
+import { HttpClient} from '@angular/common/http';
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -25,6 +28,7 @@ import { DeviceOrientation, DeviceOrientationCompassHeading } from '@ionic-nativ
     Geolocation,
     DeviceOrientation,
     NativeGeocoder,
+    HttpClient,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]
