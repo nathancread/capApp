@@ -3,6 +3,8 @@ import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { NativeGeocoder, NativeGeocoderResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
 import { DeviceOrientation, DeviceOrientationCompassHeading } from '@ionic-native/device-orientation/ngx';
+import { HttpClient } from '@angular/common/http';
+import { observable } from 'rxjs';
 
 @Component({
   selector: 'app-tab1',
@@ -14,6 +16,7 @@ export class Tab1Page {
   //check marks
   compassButton: string;
   pictureButton: string;
+  dataSent: any
 
 
   //holds camera output
@@ -45,7 +48,8 @@ export class Tab1Page {
     private geolocation: Geolocation,
     private nativeGeocoder: NativeGeocoder,
     private deviceOrientation: DeviceOrientation,
-    private camera: Camera) 
+    private camera: Camera,
+    private http: HttpClient) 
     {
       this.btnText = "Read Compass";
       this.compassButton ="radio-button-off";
@@ -168,5 +172,37 @@ export class Tab1Page {
        this.btnText = 'Read Compass';
     }
  }
+
+//////////////////
+/// Sending SUTFF/////
+/////////////////
+
+
+
+ postData(){
+  //this.getGeolocation();
+  
+  var headers = new Headers();
+  headers.append("Accept", 'application/json');
+  headers.append('Content-Type', 'application/json' );
+
+
+  let postData =  {
+    image: this.currentImage,
+    latitude: this.geoLatitude,
+    longitude: this.geoLongitude,
+    compass: this.magneticReading
+}
+
+  this.http.post("http://dataserver-dev.us-west-2.elasticbeanstalk.com/data", postData,{observe: 'response'})
+    .subscribe(data => {
+      //after we are done
+      console.log(data);
+      this.dataSent = data.body.toString();
+     }, error => {
+      this.dataSent = "failed to post";
+    });
+
+}
 
 }

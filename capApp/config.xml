@@ -101,5 +101,5 @@
     <plugin name="cordova-plugin-ionic-keyboard" spec="^2.0.5" />
     <plugin name="cordova-plugin-camera" spec="^4.0.1" />
     <allow-navigation href="http://localhost:8100" sessionid="10fe3895" />
-    <allow-navigation href="http://localhost:8101" sessionid="d5fff845" />
+    <allow-navigation href="http://localhost:8101" sessionid="b319795d" />
 </widget>

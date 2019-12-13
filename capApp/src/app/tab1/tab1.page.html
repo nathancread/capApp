@@ -33,11 +33,14 @@
         <ion-label>Read Compass</ion-label>
       </ion-item>
 
-      <ion-item href="https://ionicframework.com/docs/layout/structure">
+      <ion-item (click)="postData()">
         <ion-icon slot="start" color="medium" name="send"></ion-icon>
         <ion-label>Send Data</ion-label>
       </ion-item>
 
+      <ion-item >
+          <ion-label>{{dataSent}}</ion-label>
+      </ion-item>
 
 
 
