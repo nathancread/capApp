@@ -43,6 +43,8 @@ export class Tab1Page {
     compassReading: DeviceOrientationCompassHeading;
     btnText: any
     subsciptionCompass : any;
+    blobImage: Blob;
+    fileImage: File;
 
   constructor(
     private geolocation: Geolocation,
@@ -68,20 +70,36 @@ export class Tab1Page {
   takePicture() {
     const options: CameraOptions = {
       quality: 100,
-      destinationType: this.camera.DestinationType.DATA_URL,
+      destinationType: this.camera.DestinationType.NATIVE_URI,
       encodingType: this.camera.EncodingType.JPEG,
-      mediaType: this.camera.MediaType.PICTURE
+      mediaType: this.camera.MediaType.PICTURE 
     };
 
     this.camera.getPicture(options).then((imageData) => {
-      this.currentImage = 'data:image/jpeg;base64,' + imageData;
+      //removed :'data:image/jpeg;base64,' +
+      this.currentImage =  imageData;
       this.pictureButton = "checkmark-circle-outline";
     }, (err) => {
       // Handle error
       console.log("Camera issue:" + err);
     });
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      this.blobImage = new Blob([reader.result],{type:"image/jpeg"});
+    }
+    reader.readAsArrayBuffer(this.currentImage);
+    
+    
+
+
   }
 
+
+  ////garbage
+
+
+  ///end garbage 
 
 
   /////////////
@@ -186,21 +204,30 @@ export class Tab1Page {
   headers.append("Accept", 'application/json');
   headers.append('Content-Type', 'application/json' );
 
+  let formData = new FormData();
+  formData.append('text', this.geoLatitude.toString());
+  formData.append('text', this.geoLongitude.toString());
+  formData.append('text', this.magneticReading.toString());
+  formData.append('file', this.blobImage);
 
+/*
   let postData =  {
-    image: this.currentImage,
     latitude: this.geoLatitude,
     longitude: this.geoLongitude,
-    compass: this.magneticReading
-}
+    compass: this.magneticReading,
+    image: this.currentImage
 
-  this.http.post("http://dataserver-dev.us-west-2.elasticbeanstalk.com/data", postData,{observe: 'response'})
+}
+*/
+this.dataSent = "trying";
+
+  this.http.post("http://18.236.117.181:8081/", formData,{observe: 'response'})
     .subscribe(data => {
       //after we are done
       console.log(data);
-      this.dataSent = data.body.toString();
+      this.dataSent = "sent";
      }, error => {
-      this.dataSent = "failed to post";
+      this.dataSent = "failed";
     });
 
 }
