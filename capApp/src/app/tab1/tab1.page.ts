@@ -3,8 +3,9 @@ import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { NativeGeocoder, NativeGeocoderResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
 import { DeviceOrientation, DeviceOrientationCompassHeading } from '@ionic-native/device-orientation/ngx';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { observable } from 'rxjs';
+//import { RequestOptions } from '@angular/common/http';
 
 @Component({
   selector: 'app-tab1',
@@ -45,6 +46,7 @@ export class Tab1Page {
     subsciptionCompass : any;
     blobImage: Blob;
     fileImage: File;
+    imageData: string;
 
   constructor(
     private geolocation: Geolocation,
@@ -70,27 +72,24 @@ export class Tab1Page {
   takePicture() {
     const options: CameraOptions = {
       quality: 100,
-      destinationType: this.camera.DestinationType.NATIVE_URI,
+      destinationType: this.camera.DestinationType.DATA_URL,
       encodingType: this.camera.EncodingType.JPEG,
       mediaType: this.camera.MediaType.PICTURE 
     };
 
     this.camera.getPicture(options).then((imageData) => {
       //removed :'data:image/jpeg;base64,' +
-      this.currentImage =  imageData;
+      this.currentImage =  'data:image/jpeg;base64,' + imageData;
+      this.blobImage = new Blob([atob(imageData)], {type:"image/jpeg"});
+
+      //this.imageData = imageData;
       this.pictureButton = "checkmark-circle-outline";
     }, (err) => {
       // Handle error
       console.log("Camera issue:" + err);
     });
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      this.blobImage = new Blob([reader.result],{type:"image/jpeg"});
-    }
-    reader.readAsArrayBuffer(this.currentImage);
-    
-    
+
 
 
   }
@@ -200,34 +199,45 @@ export class Tab1Page {
  postData(){
   //this.getGeolocation();
   
-  var headers = new Headers();
-  headers.append("Accept", 'application/json');
-  headers.append('Content-Type', 'application/json' );
+  var headers = new HttpHeaders();
+  //headers.append("Accept", 'application/json');
+  headers.set('Content-Type', 'multipart/form-data');
 
+  let  requestOptions = {
+    headers: headers
+  }
+  
+  
   let formData = new FormData();
-  formData.append('text', this.geoLatitude.toString());
-  formData.append('text', this.geoLongitude.toString());
-  formData.append('text', this.magneticReading.toString());
-  formData.append('file', this.blobImage);
+  formData.append('latitude', this.geoLatitude.toString());
+  formData.append('longitude', this.geoLongitude.toString());
+  formData.append('compass', this.magneticReading.toString());
+  formData.append('image', this.blobImage, "image.jpeg");
+
 
 /*
+
   let postData =  {
     latitude: this.geoLatitude,
     longitude: this.geoLongitude,
     compass: this.magneticReading,
-    image: this.currentImage
+    image: this.blobImage
 
 }
 */
+
+
 this.dataSent = "trying";
 
-  this.http.post("http://18.236.117.181:8081/", formData,{observe: 'response'})
+  this.http.post("http://18.236.117.181:8081/", formData,{observe: 'response', ...requestOptions})
     .subscribe(data => {
       //after we are done
       console.log(data);
       this.dataSent = "sent";
      }, error => {
+       console.log(error);
       this.dataSent = "failed";
+
     });
 
 }
