@@ -81,7 +81,7 @@ export class Tab1Page {
       //removed :'data:image/jpeg;base64,' +
       this.currentImage =  'data:image/jpeg;base64,' + imageData;
       this.blobImage = new Blob([atob(imageData)], {type:"image/jpeg"});
-
+      //this.fileImage = new File([this.blobImage,"testFile",{type: "image/jpeg"});
       //this.imageData = imageData;
       this.pictureButton = "checkmark-circle-outline";
     }, (err) => {
@@ -206,25 +206,15 @@ export class Tab1Page {
   let  requestOptions = {
     headers: headers
   }
-  
+  let s = Date.now().toString();
+
   
   let formData = new FormData();
   formData.append('latitude', this.geoLatitude.toString());
   formData.append('longitude', this.geoLongitude.toString());
   formData.append('compass', this.magneticReading.toString());
-  formData.append('image', this.blobImage, "image.jpeg");
+  formData.append('image', this.blobImage, s+".jpeg");
 
-
-/*
-
-  let postData =  {
-    latitude: this.geoLatitude,
-    longitude: this.geoLongitude,
-    compass: this.magneticReading,
-    image: this.blobImage
-
-}
-*/
 
 
 this.dataSent = "trying";
@@ -236,7 +226,7 @@ this.dataSent = "trying";
       this.dataSent = "sent";
      }, error => {
        console.log(error);
-      this.dataSent = "failed";
+      this.dataSent = "failed" + this.blobImage.size;
 
     });
 
