@@ -5,6 +5,8 @@ import { NativeGeocoder, NativeGeocoderResult, NativeGeocoderOptions } from '@io
 import { DeviceOrientation, DeviceOrientationCompassHeading } from '@ionic-native/device-orientation/ngx';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { observable } from 'rxjs';
+import { AlertController } from '@ionic/angular';
+
 //import { RequestOptions } from '@angular/common/http';
 
 @Component({
@@ -48,11 +50,16 @@ export class Tab1Page {
     fileImage: File;
     imageData: string;
 
+
+    // holds check button
+    classification: any;
+    
   constructor(
     private geolocation: Geolocation,
     private nativeGeocoder: NativeGeocoder,
     private deviceOrientation: DeviceOrientation,
     private camera: Camera,
+    private alertController: AlertController,
     private http: HttpClient) 
     {
       this.btnText = "Read Compass";
@@ -190,6 +197,34 @@ export class Tab1Page {
     }
  }
 
+///////////////////
+/// Radio Button //
+//////////////////
+
+async presentAlertMultipleButtons() {
+  const alert = await this.alertController.create({
+    header: 'Manual Classification',
+    message: 'Pick one',
+    buttons: [
+      {
+        text: 'Flood Related Object',
+        handler: (blah) => {
+          this.classification = 'Flood Related Object';
+        }
+      }, {
+        text: 'Blackout Related Object',
+        handler: () => {
+          this.classification = 'Blackout Related Object';
+        }
+      }
+    ]
+  });
+
+  await alert.present();
+}
+
+
+
 //////////////////
 /// Sending SUTFF/////
 /////////////////
@@ -213,10 +248,11 @@ export class Tab1Page {
   formData.append('latitude', this.geoLatitude.toString());
   formData.append('longitude', this.geoLongitude.toString());
   formData.append('compass', this.magneticReading.toString());
+  formData.append('classification', this.classification);
   formData.append('image', this.blobImage, s+".jpeg");
 
 
-
+this.presentAlertMultipleButtons();
 this.dataSent = "trying";
 
   this.http.post("http://18.236.117.181:8081/", formData,{observe: 'response', ...requestOptions})

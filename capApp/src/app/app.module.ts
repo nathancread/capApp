@@ -17,6 +17,8 @@ import { DeviceOrientation, DeviceOrientationCompassHeading } from '@ionic-nativ
 import { HttpClientModule } from '@angular/common/http';
 
 import { HttpClient} from '@angular/common/http';
+import { AlertController } from '@ionic/angular';
+
 //import { RequestOptions } from '@angular/common/http';
 
 @NgModule({
@@ -27,6 +29,7 @@ import { HttpClient} from '@angular/common/http';
     StatusBar,
     SplashScreen,
     Camera,
+    AlertController,
     Geolocation,
     DeviceOrientation,
     NativeGeocoder,
