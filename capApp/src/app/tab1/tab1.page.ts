@@ -79,44 +79,11 @@ export class Tab1Page {
   ////////////
   //Camera code
   /////////////
-
-
-
   async takePicture() {
       this.actualImage = await this.imageManagementService.uploadFromCamera();
       this.pictureButton = "checkmark-circle-outline";
 
-    /*
-    const options: CameraOptions = {
-      quality: 100,
-      destinationType: this.camera.DestinationType.FILE_URI,
-      encodingType: this.camera.EncodingType.JPEG,
-      mediaType: this.camera.MediaType.PICTURE 
-    };
-
-    this.camera.getPicture(options).then((imageData) => {
-      //blob code 
-      //this.currentImage =  'data:image/jpeg;base64,' + imageData;
-      //this.blobImage = new Blob([atob(imageData)], {type:"image/jpeg"});
-     // const imageFile = await this.realFileLoaderService.getSingleFile(imageData);
-
-
-      this.pictureButton = "checkmark-circle-outline";
-    }, (err) => {
-      // Handle error
-      console.log("Camera issue:" + err);
-    });
-*/
-
-
-
-  }
-
-
-  ////garbage
-
-
-  ///end garbage 
+    }
 
 
   /////////////
@@ -125,7 +92,7 @@ export class Tab1Page {
 
 
   //Get current coordinates of device
-  getGeolocation(){
+  async getGeolocation(){
     this.geolocation.getCurrentPosition().then((resp) => {
       this.geoLatitude = resp.coords.latitude;
       this.geoLongitude = resp.coords.longitude; 
@@ -167,20 +134,6 @@ export class Tab1Page {
 //////////////////
 /// COMPASS SUTFF/////
 /////////////////
-
-
-
-  getCompass()
-  {
-  // Get the device current compass heading
-  this.deviceOrientation.getCurrentHeading().then(
-    (data: DeviceOrientationCompassHeading) => this.compassReading = data,
-    (error: any) => console.log(error)
-  );
-  this.magneticReading = this.compassReading.magneticHeading;
-  this.trueReading = this.compassReading.trueHeading;
-
-  }
     
   startCompass()
   {
@@ -196,7 +149,7 @@ export class Tab1Page {
     this.subsciptionCompass.unsubscribe();
   }
 
-  check() {
+  clickCompass() {
     if (this.btnText == 'Read Compass') {
        this.startCompass();
        this.btnText = 'End Compass';
@@ -212,7 +165,7 @@ export class Tab1Page {
 /// Radio Button //
 //////////////////
 
-async presentAlertMultipleButtons() {
+async presentAlertMultipleButtons(): Promise<string>  {
   const alert = await this.alertController.create({
     header: 'Manual Classification',
     message: 'Pick one',
@@ -232,6 +185,8 @@ async presentAlertMultipleButtons() {
   });
 
   await alert.present();
+  return this.classification;
+
 }
 
 
@@ -240,30 +195,31 @@ async presentAlertMultipleButtons() {
 /// Sending SUTFF/////
 /////////////////
 
+async clickSend()
+{
+  this.dataSent = "trying";
+  const alert = await this.presentAlertMultipleButtons();
+  this.postData(alert);
+
+}
 
 
- async postData(){
+ async postData(alert:string){
   
 
-  //this.dataSent = "trying";
-  //await this.presentAlertMultipleButtons();
-
-
   var headers = new HttpHeaders();
-  //headers.append("Accept", 'application/json');
   headers.set('Content-Type', 'multipart/form-data');
-
   let  requestOptions = {
     headers: headers
   }
+
   let s = Date.now().toString();
 
-  
   let formData = new FormData();
   formData.append('latitude', this.geoLatitude.toString());
   formData.append('longitude', this.geoLongitude.toString());
   formData.append('compass', this.magneticReading.toString());
-  //formData.append('classification', this.classification);
+  formData.append('classification', alert);
   formData.append('image', this.actualImage, s+".jpeg");
 
 
