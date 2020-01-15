@@ -6,7 +6,8 @@ import { DeviceOrientation, DeviceOrientationCompassHeading } from '@ionic-nativ
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { observable } from 'rxjs';
 import { AlertController } from '@ionic/angular';
-
+import { ImageManagementService } from './image-management.service';
+import { RealFileLoaderService } from './real-file-loader.service';
 //import { RequestOptions } from '@angular/common/http';
 
 @Component({
@@ -20,6 +21,7 @@ export class Tab1Page {
   compassButton: string;
   pictureButton: string;
   dataSent: any
+  test :any
 
 
   //holds camera output
@@ -46,9 +48,11 @@ export class Tab1Page {
     compassReading: DeviceOrientationCompassHeading;
     btnText: any
     subsciptionCompass : any;
+
     blobImage: Blob;
     fileImage: File;
     imageData: string;
+    actualImage: any;
 
 
     // holds check button
@@ -60,6 +64,8 @@ export class Tab1Page {
     private deviceOrientation: DeviceOrientation,
     private camera: Camera,
     private alertController: AlertController,
+    private imageManagementService: ImageManagementService,
+    private realFileLoaderService: RealFileLoaderService,
     private http: HttpClient) 
     {
       this.btnText = "Read Compass";
@@ -76,26 +82,31 @@ export class Tab1Page {
 
 
 
-  takePicture() {
+  async takePicture() {
+      this.actualImage = await this.imageManagementService.uploadFromCamera();
+      this.pictureButton = "checkmark-circle-outline";
+
+    /*
     const options: CameraOptions = {
       quality: 100,
-      destinationType: this.camera.DestinationType.DATA_URL,
+      destinationType: this.camera.DestinationType.FILE_URI,
       encodingType: this.camera.EncodingType.JPEG,
       mediaType: this.camera.MediaType.PICTURE 
     };
 
     this.camera.getPicture(options).then((imageData) => {
-      //removed :'data:image/jpeg;base64,' +
-      this.currentImage =  'data:image/jpeg;base64,' + imageData;
-      this.blobImage = new Blob([atob(imageData)], {type:"image/jpeg"});
-      //this.fileImage = new File([this.blobImage,"testFile",{type: "image/jpeg"});
-      //this.imageData = imageData;
+      //blob code 
+      //this.currentImage =  'data:image/jpeg;base64,' + imageData;
+      //this.blobImage = new Blob([atob(imageData)], {type:"image/jpeg"});
+     // const imageFile = await this.realFileLoaderService.getSingleFile(imageData);
+
+
       this.pictureButton = "checkmark-circle-outline";
     }, (err) => {
       // Handle error
       console.log("Camera issue:" + err);
     });
-
+*/
 
 
 
@@ -231,9 +242,13 @@ async presentAlertMultipleButtons() {
 
 
 
- postData(){
-  //this.getGeolocation();
+ async postData(){
   
+
+  //this.dataSent = "trying";
+  //await this.presentAlertMultipleButtons();
+
+
   var headers = new HttpHeaders();
   //headers.append("Accept", 'application/json');
   headers.set('Content-Type', 'multipart/form-data');
@@ -248,12 +263,10 @@ async presentAlertMultipleButtons() {
   formData.append('latitude', this.geoLatitude.toString());
   formData.append('longitude', this.geoLongitude.toString());
   formData.append('compass', this.magneticReading.toString());
-  formData.append('classification', this.classification);
-  formData.append('image', this.blobImage, s+".jpeg");
+  //formData.append('classification', this.classification);
+  formData.append('image', this.actualImage, s+".jpeg");
 
 
-this.presentAlertMultipleButtons();
-this.dataSent = "trying";
 
   this.http.post("http://18.236.117.181:8081/", formData,{observe: 'response', ...requestOptions})
     .subscribe(data => {
@@ -262,7 +275,7 @@ this.dataSent = "trying";
       this.dataSent = "sent";
      }, error => {
        console.log(error);
-      this.dataSent = "failed" + this.blobImage.size;
+      this.dataSent = "failed";
 
     });
 

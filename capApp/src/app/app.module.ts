@@ -19,6 +19,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { HttpClient} from '@angular/common/http';
 import { AlertController } from '@ionic/angular';
 
+import { File as IonicFileService,IFile,FileEntry} from '@ionic-native/file/ngx';
+import { ImageManagementService } from './tab1/image-management.service';
+import { RealFileLoaderService } from './tab1/real-file-loader.service';
+
+
 //import { RequestOptions } from '@angular/common/http';
 
 @NgModule({
@@ -29,6 +34,9 @@ import { AlertController } from '@ionic/angular';
     StatusBar,
     SplashScreen,
     Camera,
+    ImageManagementService,
+    RealFileLoaderService,
+    IonicFileService,
     AlertController,
     Geolocation,
     DeviceOrientation,

@@ -26,6 +26,7 @@
     "@ionic-native/camera": "^5.16.0",
     "@ionic-native/core": "^5.0.0",
     "@ionic-native/device-orientation": "^5.17.0",
+    "@ionic-native/file": "^5.19.1",
     "@ionic-native/geolocation": "^5.16.0",
     "@ionic-native/gyroscope": "^5.16.0",
     "@ionic-native/http": "^5.18.0",
@@ -50,7 +51,7 @@
   },
   "devDependencies": {
     "@angular-devkit/architect": "~0.801.2",
-    "@angular-devkit/build-angular": "~0.801.2",
+    "@angular-devkit/build-angular": "^0.803.22",
     "@angular-devkit/core": "~8.1.2",
     "@angular-devkit/schematics": "~8.1.2",
     "@angular/cli": "~8.1.2",
@@ -99,7 +100,8 @@
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-advanced-http": {
         "OKHTTP_VERSION": "3.10.0"
-      }
+      },
+      "cordova-plugin-file": {}
     },
     "platforms": [
       "android"
