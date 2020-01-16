@@ -1,13 +1,9 @@
 import { Component } from '@angular/core';
-import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
-import { NativeGeocoder, NativeGeocoderResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
 import { DeviceOrientation, DeviceOrientationCompassHeading } from '@ionic-native/device-orientation/ngx';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { observable } from 'rxjs';
 import { AlertController } from '@ionic/angular';
 import { ImageManagementService } from './image-management.service';
-import { RealFileLoaderService } from './real-file-loader.service';
+import {GeoManagementService} from './geo-management-service'
 //import { RequestOptions } from '@angular/common/http';
 
 @Component({
@@ -22,150 +18,68 @@ export class Tab1Page {
   pictureButton: string;
   dataSent: any
   test :any
-
-
-  //holds camera output
-  currentImage: any;
-
-  //holds geoloc output
+  //geoloc
   geoLatitude: number;
   geoLongitude: number;
-  geoAccuracy:number;
-  geoAddress: string;
-  watchLocationUpdates:any; 
-  loading:any;
-  isWatching:boolean;
-
-    //Geocoder configuration
-    geoencoderOptions: NativeGeocoderOptions = {
-      useLocale: true,
-      maxResults: 5
-    };
-
-    //compass vars
-    magneticReading: any;
-    trueReading: any;
-    compassReading: DeviceOrientationCompassHeading;
-    btnText: any
-    subsciptionCompass : any;
-
-    blobImage: Blob;
-    fileImage: File;
-    imageData: string;
-    actualImage: any;
-
-
-    // holds check button
-    classification: any;
+  //compass vars
+  magneticReading: any;
+  btnText: any
+  subsciptionCompass : any;
+  //image vars
+  actualImage: any;
+  // classification vars
+  classification: any;
     
   constructor(
-    private geolocation: Geolocation,
-    private nativeGeocoder: NativeGeocoder,
     private deviceOrientation: DeviceOrientation,
-    private camera: Camera,
     private alertController: AlertController,
     private imageManagementService: ImageManagementService,
-    private realFileLoaderService: RealFileLoaderService,
+    private geomanagementService: GeoManagementService,
     private http: HttpClient) 
     {
       this.btnText = "Read Compass";
       this.compassButton ="radio-button-off";
       this.pictureButton ="radio-button-off";
+      this.classification="none";
 
     }
 
-
-
-  ////////////
   //Camera code
-  /////////////
   async takePicture() {
       this.actualImage = await this.imageManagementService.uploadFromCamera();
       this.pictureButton = "checkmark-circle-outline";
-
     }
 
-
-  /////////////
-  ///geolocator code
-  ////////////
-
-
-  //Get current coordinates of device
-  async getGeolocation(){
-    this.geolocation.getCurrentPosition().then((resp) => {
-      this.geoLatitude = resp.coords.latitude;
-      this.geoLongitude = resp.coords.longitude; 
-      this.geoAccuracy = resp.coords.accuracy; 
-      this.getGeoencoder(this.geoLatitude,this.geoLongitude);
-     }).catch((error) => {
-       alert('Error getting location'+ JSON.stringify(error));
-     });
-  }
-
-  //geocoder method to fetch address from coordinates passed as arguments
-  getGeoencoder(latitude,longitude){
-    this.nativeGeocoder.reverseGeocode(latitude, longitude, this.geoencoderOptions)
-    .then((result: NativeGeocoderResult[]) => {
-      this.geoAddress = this.generateAddress(result[0]);
-    })
-    .catch((error: any) => {
-      alert('Error getting location'+ JSON.stringify(error));
-    });
-  }
-
-  //Return Comma saperated address
-  generateAddress(addressObj){
-      let obj = [];
-      let address = "";
-      for (let key in addressObj) {
-        obj.push(addressObj[key]);
-      }
-      obj.reverse();
-      for (let val in obj) {
-        if(obj[val].length)
-        address += obj[val]+', ';
-      }
-    return address.slice(0, -2);
-  }
-
-
-
-//////////////////
-/// COMPASS SUTFF/////
-/////////////////
-    
-  startCompass()
-  {
-    this.subsciptionCompass = this.deviceOrientation.watchHeading().subscribe(
-      (data: DeviceOrientationCompassHeading) => this.magneticReading = data.magneticHeading
-    );
-
-    //this.magneticReading = this.compassReading.magneticHeading;
-    //this.trueReading = this.compassReading.trueHeading;
-  }
-  endCompass()
-  {
-    this.subsciptionCompass.unsubscribe();
-  }
-
-  clickCompass() {
+  //compass code
+  async clickCompass() {
     if (this.btnText == 'Read Compass') {
        this.startCompass();
        this.btnText = 'End Compass';
     } else if(this.btnText == 'End Compass') {
        this.endCompass();
-       this.getGeolocation();
+       const loc = await this.geomanagementService.getGeolocation();
+       this.geoLatitude = loc[0];
+       this.geoLongitude = loc[1];
        this.compassButton = "checkmark-circle-outline";
        this.btnText = 'Read Compass';
     }
  }
 
-///////////////////
-/// Radio Button //
-//////////////////
+ startCompass()
+ {
+   this.subsciptionCompass = this.deviceOrientation.watchHeading().subscribe(
+     (data: DeviceOrientationCompassHeading) => this.magneticReading = data.magneticHeading
+   );
+ }
+ endCompass()
+ {
+   this.subsciptionCompass.unsubscribe();
+ }
 
+//radio button alert
 async presentAlertMultipleButtons(): Promise<string>  {
+
+  
   const alert = await this.alertController.create({
     header: 'Manual Classification',
     message: 'Pick one',
@@ -174,20 +88,24 @@ async presentAlertMultipleButtons(): Promise<string>  {
         text: 'Flood Related Object',
         handler: (blah) => {
           this.classification = 'Flood Related Object';
+          return this.classification;
         }
       }, {
         text: 'Blackout Related Object',
         handler: () => {
           this.classification = 'Blackout Related Object';
+          return this.classification;
         }
       }
-    ]
   });
 
   await alert.present();
-  return this.classification;
+  //return this.classification;
 
 }
+
+
+
 
 
 
@@ -197,9 +115,14 @@ async presentAlertMultipleButtons(): Promise<string>  {
 
 async clickSend()
 {
-  this.dataSent = "trying";
-  const alert = await this.presentAlertMultipleButtons();
-  this.postData(alert);
+  this.dataSent = "awaiting input";
+  await Promise.resolve(this.presentAlertMultipleButtons()).then((resp) => {
+    this.dataSent = "trying";
+    this.postData(resp);
+}).catch((error) => {
+  alert('Error with popup'+ JSON.stringify(error));
+});
+
 
 }
 
