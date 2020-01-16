@@ -43,7 +43,6 @@ import {GeoManagementService} from './tab1/geo-management-service';
     DeviceOrientation,
     NativeGeocoder,
     GeoManagementService,
-    //RequestOptions,
     HttpClient,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
