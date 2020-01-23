@@ -21,6 +21,11 @@
           <p> Compass Reading: {{magneticReading}} </p> 
         </div>
       </ion-item>
+      <ion-item>
+        <div *ngIf="geoLatitude">
+          <p> Location: {{geoLatitude}},{{geoLongitude}} </p> 
+        </div>
+      </ion-item>
       </ion-list-header>
 
       <ion-item (click)="takePicture()">
@@ -30,7 +35,12 @@
 
       <ion-item (click)="clickCompass()">
         <ion-icon slot="start" color="medium" name={{compassButton}}></ion-icon>
-        <ion-label>Read Compass</ion-label>
+        <ion-label>{{CompassButtonText}}</ion-label>
+      </ion-item>
+
+      <ion-item (click)="clickClassification()">
+        <ion-icon slot="start" color="medium" name={{classificationButton}}></ion-icon>
+        <ion-label>Add Classification</ion-label>
       </ion-item>
 
       <ion-item (click)="clickSend()">

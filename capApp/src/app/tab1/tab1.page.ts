@@ -15,14 +15,14 @@ export class Tab1Page {
   //check marks
   compassButton: string;
   pictureButton: string;
+  classificationButton: string;
   dataSent: any
-  test: any
   //geoloc
   geoLatitude: number;
   geoLongitude: number;
   //compass vars
   magneticReading: any;
-  btnText: any
+  CompassButtonText: any
   subsciptionCompass: any;
   //image vars
   actualImage: any;
@@ -35,9 +35,10 @@ export class Tab1Page {
     private imageManagementService: ImageManagementService,
     private geomanagementService: GeoManagementService,
     private http: HttpClient) {
-    this.btnText = "Read Compass";
+    this.CompassButtonText = "Read Compass";
     this.compassButton = "radio-button-off";
     this.pictureButton = "radio-button-off";
+    this.classificationButton = "radio-button-off";
     this.classification = "none";
   }
 
@@ -49,11 +50,15 @@ export class Tab1Page {
 
   //compass code
   async clickCompass() {
-    if (this.btnText == 'Read Compass') {
-      this.startCompass();
-      this.btnText = 'End Compass';
-    } else if (this.btnText == 'End Compass') {
-      this.endCompass();
+    if (this.CompassButtonText == 'Read Compass') {
+      //start compass
+      this.subsciptionCompass = this.deviceOrientation.watchHeading().subscribe(
+        (data: DeviceOrientationCompassHeading) => this.magneticReading = data.magneticHeading
+      );
+      this.CompassButtonText = 'End Compass';
+    } 
+    else if (this.CompassButtonText == 'End Compass') {
+      this.subsciptionCompass.unsubscribe();
       await Promise.resolve(this.geomanagementService.getGeolocation()).then((resp) => {
         this.geoLatitude = resp[0]
         this.geoLongitude = resp[1]
@@ -61,17 +66,8 @@ export class Tab1Page {
         alert('Error with geo' + JSON.stringify(error));
       });
       this.compassButton = "checkmark-circle-outline";
-      this.btnText = 'Read Compass';
+      this.CompassButtonText = 'Read Compass';
     }
-  }
-
-  startCompass() {
-    this.subsciptionCompass = this.deviceOrientation.watchHeading().subscribe(
-      (data: DeviceOrientationCompassHeading) => this.magneticReading = data.magneticHeading
-    );
-  }
-  endCompass() {
-    this.subsciptionCompass.unsubscribe();
   }
 
 
@@ -103,12 +99,12 @@ export class Tab1Page {
     });
   }
 
-  //Sending SUTFF
-  async clickSend() {
-    this.dataSent = "awaiting input";
+  //classification stuff
+  async clickClassification() {
     await Promise.resolve(this.presentAlert()).then((resp) => {
-      this.dataSent = "trying";
-      this.postData(resp);
+      this.classification = resp;
+      this.classificationButton = "checkmark-circle-outline";
+
     }).catch((error) => {
       alert('Error with popup' + JSON.stringify(error));
     });
@@ -116,8 +112,24 @@ export class Tab1Page {
 
   }
 
+  async reset() {
+   this.magneticReading = null;
+   this.geoLatitude = null;
+   this.geoLongitude = null;
+   this.classification = null;
+   this.actualImage = null;
 
-  async postData(alert: string) {
+   this.CompassButtonText = "Read Compass";
+   this.compassButton = "radio-button-off";
+   this.pictureButton = "radio-button-off";
+   this.classificationButton = "radio-button-off";
+   this.classification = "none";
+
+  }
+
+  //sending stuff
+  async clickSend() {
+    this.dataSent = "trying";
     var headers = new HttpHeaders();
     headers.set('Content-Type', 'multipart/form-data');
     let requestOptions = {
@@ -130,10 +142,10 @@ export class Tab1Page {
     formData.append('latitude', this.geoLatitude.toString());
     formData.append('longitude', this.geoLongitude.toString());
     formData.append('compass', this.magneticReading.toString());
-    formData.append('classification', alert);
+    formData.append('classification', this.classification.toString());
     formData.append('image', this.actualImage, s + ".jpeg");
 
-    this.http.post("http://18.236.117.181:8081/", formData, { observe: 'response', ...requestOptions })
+    this.http.post("http://54.70.46.85:8081/ ", formData, { observe: 'response', ...requestOptions })
       .subscribe(data => {
         //after we are done
         console.log(data);
