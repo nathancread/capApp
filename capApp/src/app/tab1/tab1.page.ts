@@ -16,7 +16,7 @@ export class Tab1Page {
   compassButton: string;
   pictureButton: string;
   classificationButton: string;
-  dataSent: any
+  message: any
   //geoloc
   geoLatitude: number;
   geoLongitude: number;
@@ -123,13 +123,12 @@ export class Tab1Page {
    this.compassButton = "radio-button-off";
    this.pictureButton = "radio-button-off";
    this.classificationButton = "radio-button-off";
-   this.classification = "none";
 
   }
 
   //sending stuff
   async clickSend() {
-    this.dataSent = "trying";
+    this.message = "trying";
     var headers = new HttpHeaders();
     headers.set('Content-Type', 'multipart/form-data');
     let requestOptions = {
@@ -138,21 +137,22 @@ export class Tab1Page {
 
     let s = Date.now().toString();
     let formData = new FormData();
-
+//test
     formData.append('latitude', this.geoLatitude.toString());
     formData.append('longitude', this.geoLongitude.toString());
     formData.append('compass', this.magneticReading.toString());
     formData.append('classification', this.classification.toString());
     formData.append('image', this.actualImage, s + ".jpeg");
 
-    this.http.post("http://54.70.46.85:8081/ ", formData, { observe: 'response', ...requestOptions })
+    this.http.post("http://backend.digitaltwincities.info/ ", formData, { observe: 'response', ...requestOptions })
       .subscribe(data => {
         //after we are done
         console.log(data);
-        this.dataSent = "sent";
+        this.message = "sent";
+        this.reset();
       }, error => {
         console.log(error);
-        this.dataSent = "failed";
+        this.message = "failed";
       });
   }
 }
