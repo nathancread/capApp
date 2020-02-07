@@ -20,8 +20,12 @@ export class Tab1Page {
   //geoloc
   geoLatitude: number;
   geoLongitude: number;
+  geoLongitudeDisplay: string;
+  geoLatitudeDisplay: string;
+
   //compass vars
   magneticReading: any;
+  compassDisplay: string;
   CompassButtonText: any
   subsciptionCompass: any;
   //image vars
@@ -53,18 +57,15 @@ export class Tab1Page {
     if (this.CompassButtonText == 'Read Compass') {
       //start compass
       this.subsciptionCompass = this.deviceOrientation.watchHeading().subscribe(
-        (data: DeviceOrientationCompassHeading) => this.magneticReading = data.magneticHeading
+        (data: DeviceOrientationCompassHeading) => {
+          this.magneticReading = data.magneticHeading;
+          this.compassDisplay = (String(data.magneticHeading).split(".")[0] + "     ").slice(0, 4);
+        }
       );
       this.CompassButtonText = 'End Compass';
-    } 
+    }
     else if (this.CompassButtonText == 'End Compass') {
       this.subsciptionCompass.unsubscribe();
-      await Promise.resolve(this.geomanagementService.getGeolocation()).then((resp) => {
-        this.geoLatitude = resp[0]
-        this.geoLongitude = resp[1]
-      }).catch((error) => {
-        alert('Error with geo' + JSON.stringify(error));
-      });
       this.compassButton = "checkmark-circle-outline";
       this.CompassButtonText = 'Read Compass';
     }
@@ -99,8 +100,22 @@ export class Tab1Page {
     });
   }
 
+  async delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
   //classification stuff
   async clickClassification() {
+
+    //get geolocation
+    await Promise.resolve(this.geomanagementService.getGeolocation()).then((resp) => {
+      this.geoLatitude = resp[0]
+      this.geoLongitude = resp[1]
+      // this.geoLatitudeDisplay = String(this.geoLatitude).substring(0,4) 
+      // this.geoLongitudeDisplay = String(this.geoLongitude).substring(0,4) 
+    }).catch((error) => {
+      alert('Error with geo' + JSON.stringify(error));
+    });
+
     await Promise.resolve(this.presentAlert()).then((resp) => {
       this.classification = resp;
       this.classificationButton = "checkmark-circle-outline";
@@ -113,21 +128,24 @@ export class Tab1Page {
   }
 
   async reset() {
-   this.magneticReading = null;
-   this.geoLatitude = null;
-   this.geoLongitude = null;
-   this.classification = null;
-   this.actualImage = null;
+    this.magneticReading = null;
+    this.geoLatitude = null;
+    this.geoLongitude = null;
+    this.classification = null;
+    this.actualImage = null;
+    this.message = null;
 
-   this.CompassButtonText = "Read Compass";
-   this.compassButton = "radio-button-off";
-   this.pictureButton = "radio-button-off";
-   this.classificationButton = "radio-button-off";
+
+    this.CompassButtonText = "Read Compass";
+    this.compassButton = "radio-button-off";
+    this.pictureButton = "radio-button-off";
+    this.classificationButton = "radio-button-off";
+
 
   }
 
   //sending stuff
-  async clickSend() {
+  clickSend() {
     this.message = "trying";
     var headers = new HttpHeaders();
     headers.set('Content-Type', 'multipart/form-data');
@@ -136,23 +154,36 @@ export class Tab1Page {
     }
 
     let s = Date.now().toString();
-    let formData = new FormData();
-//test
-    formData.append('latitude', this.geoLatitude.toString());
-    formData.append('longitude', this.geoLongitude.toString());
-    formData.append('compass', this.magneticReading.toString());
-    formData.append('classification', this.classification.toString());
-    formData.append('image', this.actualImage, s + ".jpeg");
 
-    this.http.post("http://backend.digitaltwincities.info/ ", formData, { observe: 'response', ...requestOptions })
-      .subscribe(data => {
-        //after we are done
-        console.log(data);
-        this.message = "sent";
-        this.reset();
-      }, error => {
-        console.log(error);
-        this.message = "failed";
-      });
+    try {
+
+      let formData = new FormData();
+      //test
+      formData.append('latitude', this.geoLatitude.toString());
+      formData.append('longitude', this.geoLongitude.toString());
+      formData.append('compass', this.magneticReading.toString());
+      formData.append('classification', this.classification.toString());
+      formData.append('image', this.actualImage, date.toString() + ".jpeg");
+
+      this.http.post("http://backend.digitaltwincities.info/ ", formData, { observe: 'response', ...requestOptions })
+        .subscribe(data => {
+          //after we are done
+          console.log(data);
+          this.message = "sent";
+          this.reset();
+          var element = <HTMLInputElement>document.getElementById("btn1");
+          element.disabled = false;
+        }, error => {
+          console.log(error);
+          this.message = "failed";
+        });
+    }
+    catch (err) {
+      var element = <HTMLInputElement>document.getElementById("btn1");
+      element.disabled = false;
+      alert('Null Data');
+      this.message = "failed";
+      this.reset();
+    }
   }
 }

@@ -1,5 +1,4 @@
 <ion-header>
- 
 </ion-header>
 
 <ion-content>
@@ -18,12 +17,13 @@
         <ion-label>Actions</ion-label>
       <ion-item>
         <div *ngIf="magneticReading">
-          <p> Compass Reading: {{magneticReading}} </p> 
+          <p> Compass: {{compassDisplay}} </p> 
         </div>
       </ion-item>
       <ion-item>
         <div *ngIf="geoLatitude">
-          <p> Location: {{geoLatitude}},{{geoLongitude}} </p> 
+          <p> Location: {{geoLatitude}} </p> 
+          <p> {{geoLongitude}}</p>
         </div>
       </ion-item>
       </ion-list-header>
@@ -43,10 +43,12 @@
         <ion-label>Add Classification</ion-label>
       </ion-item>
 
-      <ion-item (click)="clickSend()">
-        <ion-icon slot="start" color="medium" name="send"></ion-icon>
-        <ion-label>Send Data</ion-label>
-      </ion-item>
+
+      <ion-button id= "btn1" expand="full" (click)="clickSend()" onclick = "this.disabled = true">
+        send
+        <ion-icon slot="start" name="send"></ion-icon>
+      </ion-button>
+
 
       <ion-item >
           <ion-label>{{message}}</ion-label>
@@ -56,3 +58,5 @@
 
     </ion-list>
 </ion-content>
+
+
