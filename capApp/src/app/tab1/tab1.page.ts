@@ -163,7 +163,7 @@ export class Tab1Page {
       formData.append('longitude', this.geoLongitude.toString());
       formData.append('compass', this.magneticReading.toString());
       formData.append('classification', this.classification.toString());
-      formData.append('image', this.actualImage, date.toString() + ".jpeg");
+      formData.append('image', this.actualImage, s + ".jpeg");
 
       this.http.post("http://backend.digitaltwincities.info/ ", formData, { observe: 'response', ...requestOptions })
         .subscribe(data => {
