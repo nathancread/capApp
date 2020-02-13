@@ -54,6 +54,7 @@ export class Tab1Page {
 
   //compass code
   async clickCompass() {
+    //works based on what the title of the button is
     if (this.CompassButtonText == 'Read Compass') {
       //start compass
       this.subsciptionCompass = this.deviceOrientation.watchHeading().subscribe(
@@ -64,6 +65,7 @@ export class Tab1Page {
       );
       this.CompassButtonText = 'End Compass';
     }
+    //end compass
     else if (this.CompassButtonText == 'End Compass') {
       this.subsciptionCompass.unsubscribe();
       this.compassButton = "checkmark-circle-outline";
@@ -72,9 +74,10 @@ export class Tab1Page {
   }
 
 
+  //actually shows popup 
   async presentAlert(): Promise<string> {
     return new Promise(async (resolve, reject) => {
-
+      //creates alert object
       let alert = await this.alertController.create({
         header: 'Manual Classification',
         message: 'Pick one',
@@ -82,14 +85,12 @@ export class Tab1Page {
           {
             text: 'Flood Related Object',
             handler: (blah) => {
-              //this.classification = 'Flood Related Object';
               alert.dismiss().then(() => { resolve("Flood Related Object"); });
               return false;
             }
           }, {
             text: 'Blackout Related Object',
             handler: () => {
-              //this.classification = 'Blackout Related Object';
               alert.dismiss().then(() => { resolve("Blackout Related Object"); });
               return false;
             }
@@ -100,33 +101,26 @@ export class Tab1Page {
     });
   }
 
-  async delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
   //classification stuff
   async clickClassification() {
-
     //get geolocation
     await Promise.resolve(this.geomanagementService.getGeolocation()).then((resp) => {
       this.geoLatitude = resp[0]
       this.geoLongitude = resp[1]
-      // this.geoLatitudeDisplay = String(this.geoLatitude).substring(0,4) 
-      // this.geoLongitudeDisplay = String(this.geoLongitude).substring(0,4) 
     }).catch((error) => {
       alert('Error with geo' + JSON.stringify(error));
     });
 
+    //show popup
     await Promise.resolve(this.presentAlert()).then((resp) => {
       this.classification = resp;
       this.classificationButton = "checkmark-circle-outline";
-
     }).catch((error) => {
       alert('Error with popup' + JSON.stringify(error));
     });
-
-
   }
 
+  //resets all variables
   async reset() {
     this.magneticReading = null;
     this.geoLatitude = null;
@@ -135,42 +129,42 @@ export class Tab1Page {
     this.actualImage = null;
     this.message = null;
 
-
     this.CompassButtonText = "Read Compass";
     this.compassButton = "radio-button-off";
     this.pictureButton = "radio-button-off";
     this.classificationButton = "radio-button-off";
-
-
   }
 
   //sending stuff
   clickSend() {
     this.message = "trying";
-    var headers = new HttpHeaders();
-    headers.set('Content-Type', 'multipart/form-data');
-    let requestOptions = {
-      headers: headers
-    }
 
-    let s = Date.now().toString();
-
+    //try to collect all information
     try {
+      //creates a header object for the request
+      var headers = new HttpHeaders();
+      headers.set('Content-Type', 'multipart/form-data');
+      let requestOptions = {
+        headers: headers
+      }
+      let s = Date.now().toString();
 
+      //puts all information in form data object
       let formData = new FormData();
-      //test
       formData.append('latitude', this.geoLatitude.toString());
       formData.append('longitude', this.geoLongitude.toString());
       formData.append('compass', this.magneticReading.toString());
       formData.append('classification', this.classification.toString());
       formData.append('image', this.actualImage, s + ".jpeg");
 
+      //posts data to server
       this.http.post("http://backend.digitaltwincities.info/ ", formData, { observe: 'response', ...requestOptions })
         .subscribe(data => {
-          //after we are done
           console.log(data);
           this.message = "sent";
+          //resets all variables
           this.reset();
+          //reactivates button after sending, stops multiclick 
           var element = <HTMLInputElement>document.getElementById("btn1");
           element.disabled = false;
         }, error => {
